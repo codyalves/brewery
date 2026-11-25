@@ -58,8 +58,8 @@ export function CardResults({
         <h1>Search cards</h1>
         <p className="lede">
           Type words to match card names. Add filters such as <span className="mono">t:</span> for type,{' '}
-          <span className="mono">o:</span> for Oracle text and <span className="mono">c:</span> for color
-          (w, u, b, r, g). Terms combine.
+          <span className="mono">o:</span> for Oracle text and <span className="mono">c:</span> for color (w,
+          u, b, r, g). Terms combine.
         </p>
         <h2>Try a search</h2>
         <ul>

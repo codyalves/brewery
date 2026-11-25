@@ -3,7 +3,10 @@ import { expect, test } from '@playwright/test';
 
 test('AC-1: lists matching cards with image, name and link', async ({ page }) => {
   await page.goto('/cards?q=t:instant c:u');
-  await expect(page.getByRole('link', { name: /Counterspell/ })).toHaveAttribute('href', /^\/cards\/[0-9a-f-]{36}$/);
+  await expect(page.getByRole('link', { name: /Counterspell/ })).toHaveAttribute(
+    'href',
+    /^\/cards\/[0-9a-f-]{36}$/,
+  );
   await expect(page.getByAltText('Cyclonic Rift')).toBeVisible();
 });
 
