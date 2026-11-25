@@ -344,6 +344,60 @@ textarea {
   color: var(--muted);
 }
 
+.card-grid {
+  list-style: none;
+  margin: var(--space-3) 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+  gap: var(--space-3);
+}
+
+.card-link {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.card-link img,
+.card-face {
+  display: block;
+  width: 100%;
+  aspect-ratio: 63 / 88;
+  background: var(--sunk);
+  border-radius: var(--radius-card);
+}
+
+.card-face {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-2);
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  font-size: var(--step--1);
+}
+
+.card-face-name {
+  font-weight: 720;
+  font-size: var(--step-0);
+}
+
+.card-caption {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-1);
+  font-weight: 600;
+}
+
+.pager {
+  display: flex;
+  gap: var(--space-2);
+}
+
 @media (max-width: 40rem) {
   .topbar-inner {
     flex-wrap: wrap;
