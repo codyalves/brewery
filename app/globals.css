@@ -398,6 +398,79 @@ textarea {
   gap: var(--space-2);
 }
 
+.decks {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.deck-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--rule);
+}
+
+.deck-item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+.deck-item p {
+  margin: 0;
+}
+
+.deck-name {
+  font-weight: 650;
+  font-size: var(--step-1);
+}
+
+.deck-confirm {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.button-danger,
+.button-plain {
+  padding: 0.55rem 1rem;
+  font-weight: 650;
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+.button-danger {
+  color: var(--danger);
+}
+
+.deck-form {
+  padding: var(--space-3);
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+}
+
+.deck-form-fields {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+.deck-form label {
+  display: grid;
+  gap: 0.25rem;
+  font-weight: 600;
+}
+
 @media (max-width: 40rem) {
   .topbar-inner {
     flex-wrap: wrap;
