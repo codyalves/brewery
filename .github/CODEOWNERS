@@ -1,0 +1,14 @@
+# Changes here need the owner: tooling, CI, dependencies, the design system's
+# rules and the tester's regression tests.
+/.github/            @codyalves
+/package.json        @codyalves
+/pnpm-lock.yaml      @codyalves
+/pnpm-workspace.yaml @codyalves
+/biome.json          @codyalves
+/tsconfig.json       @codyalves
+/next.config.ts      @codyalves
+/vitest.config.ts    @codyalves
+/playwright.config.ts @codyalves
+/CLAUDE.md           @codyalves
+/DESIGN.md           @codyalves
+/tests/regressions/  @codyalves
