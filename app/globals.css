@@ -246,6 +246,36 @@ textarea {
   flex: 1;
 }
 
+.combobox {
+  position: relative;
+  flex: 1;
+  display: flex;
+}
+
+.suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  background: Canvas;
+  color: var(--ink);
+  border: 1px solid var(--rule);
+}
+
+.suggestions li {
+  padding: var(--space-1) var(--space-2);
+  cursor: pointer;
+}
+
+.suggestions li[aria-selected='true'],
+.suggestions li:hover {
+  background: var(--rule);
+}
+
 .nav {
   display: flex;
   gap: var(--space-3);

@@ -25,6 +25,8 @@ const older: Deck = {
 };
 const newer = newDeck('Dragons', 'commander', new Date('2026-03-01T00:00:00Z'), 'newer');
 
+vi.mock('next/navigation', () => ({ useRouter: () => ({ push() {}, replace() {} }) }));
+
 afterEach(cleanup);
 
 describe('Topbar', () => {
