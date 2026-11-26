@@ -25,6 +25,13 @@ function oracleText(card: RawCard): string {
 }
 
 function matches(card: RawCard, term: string): boolean {
+  const cmc = /^cmc(<=|>=|=|<|>)(\d+(?:\.\d+)?)$/i.exec(term);
+  if (cmc) {
+    const n = Number(cmc[2]);
+    const v = card.cmc;
+    return { '<=': v <= n, '>=': v >= n, '=': v === n, '<': v < n, '>': v > n }[cmc[1] as string] ?? false;
+  }
+  term = term.replace(/"/g, '');
   const [key, ...rest] = term.split(':');
   const value = lower(rest.join(':'));
   if (rest.length === 0) return lower(card.name).includes(lower(term));
@@ -51,7 +58,7 @@ export async function fixtureFetch(url: string): Promise<Response> {
   const cards = recorded.cards;
 
   if (parsed.pathname === '/cards/search') {
-    const terms = (parsed.searchParams.get('q') ?? '').split(/\s+/).filter(Boolean);
+    const terms = (parsed.searchParams.get('q') ?? '').match(/(?:[^\s"]|"[^"]*")+/g) ?? [];
     const found = cards.filter((c) => terms.every((t) => matches(c, t)));
     return found.length === 0
       ? notFound()

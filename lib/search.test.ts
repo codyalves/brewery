@@ -1,0 +1,66 @@
+import { describe, expect, it, vi } from 'vitest';
+import recorded from '@/fixtures/scryfall/cards.json';
+import { fixtureFetch } from './fixtures';
+import { createScryfall } from './scryfall';
+import { buildSearchQuery, parseSearch, searchCards } from './search';
+
+const scryfall = createScryfall({ fetch: fixtureFetch });
+const names = (r: { cards: readonly { name: string }[] }) => r.cards.map((c) => c.name).sort();
+const expected = (pred: (c: (typeof recorded.cards)[number]) => boolean) =>
+  recorded.cards
+    .filter(pred)
+    .map((c) => c.name)
+    .sort();
+
+describe('search syntax', () => {
+  it('AC-1: plain words match names containing both words', async () => {
+    const result = await searchCards(scryfall, 'lightning bolt');
+    const want = expected((c) => /lightning/i.test(c.name) && /bolt/i.test(c.name));
+    expect(want.length).toBeGreaterThan(0);
+    expect(names(result)).toEqual(want);
+  });
+
+  it('AC-2: t:creature returns only creatures', async () => {
+    const result = await searchCards(scryfall, 't:creature');
+    expect(result.cards.length).toBeGreaterThan(0);
+    expect(result.cards.every((c) => c.typeLine.includes('Creature'))).toBe(true);
+    expect(names(result)).toEqual(expected((c) => c.type_line.includes('Creature')));
+  });
+
+  it('AC-3: c:r returns only red cards', async () => {
+    const result = await searchCards(scryfall, 'c:r');
+    expect(result.cards.length).toBeGreaterThan(0);
+    expect(result.cards.every((c) => c.colors.includes('R'))).toBe(true);
+    expect(names(result)).toEqual(expected((c) => c.colors.includes('R')));
+  });
+
+  it('AC-4: cmc<=2 returns only cards with mana value 2 or less', async () => {
+    const result = await searchCards(scryfall, 'cmc<=2');
+    expect(result.cards.length).toBeGreaterThan(0);
+    expect(result.cards.every((c) => c.manaValue <= 2)).toBe(true);
+    expect(names(result)).toEqual(expected((c) => c.cmc <= 2));
+  });
+
+  it('AC-5: quoted phrases are kept together as one term', async () => {
+    expect(parseSearch('t:creature o:"draw a card"')).toEqual(['t:creature', 'o:"draw a card"']);
+    expect(buildSearchQuery('  o:"draw a card"   c:u ')).toBe('o:"draw a card" c:u');
+    const result = await searchCards(scryfall, 'o:"draw a card"');
+    expect(names(result)).toEqual(
+      expected((c) => /draw a card/i.test((c as { oracle_text?: string }).oracle_text ?? '')),
+    );
+  });
+
+  it('AC-6: an empty or whitespace-only query makes no request and returns nothing', async () => {
+    const fetch = vi.fn(fixtureFetch);
+    const client = createScryfall({ fetch });
+    for (const q of ['', '   \t\n', '""']) {
+      expect(await searchCards(client, q)).toEqual({ cards: [], total: 0, hasMore: false });
+      expect(buildSearchQuery(q)).toBeNull();
+    }
+    expect(fetch).not.toHaveBeenCalled();
+  });
+
+  it('AC-7: tests are named after the criteria', () => {
+    expect(parseSearch('a b')).toEqual(['a', 'b']);
+  });
+});
