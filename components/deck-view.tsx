@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { DeckStats } from '@/components/deck-stats';
 import { decksStore } from '@/components/decks';
 import {
   addCard,
@@ -79,6 +80,7 @@ export function DeckView({ id }: { id: string }) {
         </p>
       </div>
       <AddCard onChoose={add} />
+      <DeckStats deck={deck} />
       {groupEntries(deck).map((g) => (
         <section key={g.group} className="deck-group" aria-labelledby={`group-${g.group}`}>
           <h2 id={`group-${g.group}`}>

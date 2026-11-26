@@ -13,6 +13,9 @@ export interface DeckEntry {
   readonly name: string;
   /** The card's type line, for grouping; older entries may lack it. */
   readonly typeLine?: string;
+  /** Mana cost and mana value, for stats; older entries may lack them. */
+  readonly manaCost?: string;
+  readonly manaValue?: number;
   readonly quantity: number;
   readonly board: Board;
 }
@@ -146,6 +149,8 @@ export interface CardRef {
   readonly oracleId: string;
   readonly name: string;
   readonly typeLine: string;
+  readonly manaCost?: string;
+  readonly manaValue?: number;
 }
 
 function touch(deck: Deck, entries: readonly DeckEntry[], now: Date): Deck {
@@ -163,6 +168,8 @@ export function addCard(deck: Deck, card: CardRef, now: Date): Deck {
           oracleId: card.oracleId,
           name: card.name,
           typeLine: card.typeLine,
+          ...(card.manaCost !== undefined ? { manaCost: card.manaCost } : {}),
+          ...(card.manaValue !== undefined ? { manaValue: card.manaValue } : {}),
           quantity: 1,
           board: 'main' as const,
         },
