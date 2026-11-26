@@ -5,7 +5,7 @@ test('the home page offers card search and carries the Fan Content notice', asyn
   await page.goto('/');
 
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
-  await expect(page.getByRole('searchbox', { name: 'Search cards' })).toBeVisible();
+  await expect(page.getByRole('combobox', { name: 'Search cards' })).toBeVisible();
   await expect(
     page.getByText('Brewery is unofficial Fan Content permitted under the Fan Content Policy.'),
   ).toBeVisible();
