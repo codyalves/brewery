@@ -13,6 +13,7 @@ import {
   groupEntries,
   withDeck,
 } from '@/lib/deck';
+import { addEntries, formatDecklist, parseDecklist, type ResolvedCard } from '@/lib/decklist';
 
 /** One saved deck. Card lists come later; for now it names the deck. */
 export function DeckView({ id }: { id: string }) {
@@ -65,6 +66,26 @@ export function DeckView({ id }: { id: string }) {
     }
   }
 
+  async function importText(text: string): Promise<string[]> {
+    const lines = parseDecklist(text);
+    const resolved = new Map<string, ResolvedCard | null>();
+    for (const name of new Set(lines.map((l) => l.name))) {
+      try {
+        const response = await fetch(`/api/cards/named?name=${encodeURIComponent(name)}`);
+        resolved.set(name, response.ok ? ((await response.json()) as ResolvedCard) : null);
+      } catch {
+        resolved.set(name, null);
+      }
+    }
+    const items = lines.flatMap((l) => {
+      const card = resolved.get(l.name);
+      return card ? [{ card, quantity: l.quantity, board: l.board }] : [];
+    });
+    const current = currentDeck();
+    if (current && items.length > 0) save(addEntries(current, items, new Date()));
+    return lines.filter((l) => !resolved.get(l.name)).map((l) => l.name);
+  }
+
   function change(oracleId: string, delta: number) {
     const current = currentDeck();
     if (current) save(changeQuantity(current, oracleId, delta, new Date()));
@@ -79,6 +100,7 @@ export function DeckView({ id }: { id: string }) {
         </p>
       </div>
       <AddCard onChoose={add} />
+      <ImportExport deck={deck} onImport={importText} />
       {groupEntries(deck).map((g) => (
         <section key={g.group} className="deck-group" aria-labelledby={`group-${g.group}`}>
           <h2 id={`group-${g.group}`}>
@@ -116,6 +138,82 @@ export function DeckView({ id }: { id: string }) {
         <Link href="/decks">All decks</Link>
       </p>
     </section>
+  );
+}
+
+function ImportExport({ deck, onImport }: { deck: Deck; onImport: (text: string) => Promise<string[]> }) {
+  const [mode, setMode] = useState<'import' | 'export' | null>(null);
+  const [text, setText] = useState('');
+  const [missing, setMissing] = useState<string[]>([]);
+  const [copied, setCopied] = useState(false);
+  const [busy, setBusy] = useState(false);
+
+  async function run() {
+    setBusy(true);
+    const notFound = await onImport(text);
+    setBusy(false);
+    setMissing(notFound);
+    if (notFound.length === 0) {
+      setText('');
+      setMode(null);
+    }
+  }
+
+  const exported = formatDecklist(deck);
+
+  return (
+    <div className="import-export">
+      <p>
+        <button type="button" className="button" onClick={() => setMode(mode === 'import' ? null : 'import')}>
+          Import
+        </button>{' '}
+        <button
+          type="button"
+          className="button"
+          onClick={() => {
+            setCopied(false);
+            setMode(mode === 'export' ? null : 'export');
+          }}
+        >
+          Export
+        </button>
+      </p>
+      {mode === 'import' && (
+        <div>
+          <label htmlFor="import-text">Decklist</label>
+          <textarea id="import-text" rows={10} value={text} onChange={(e) => setText(e.target.value)} />
+          <p>
+            <button type="button" className="button" disabled={busy || !text.trim()} onClick={run}>
+              Import cards
+            </button>
+          </p>
+        </div>
+      )}
+      {missing.length > 0 && <p role="alert">Not found: {missing.join(', ')}</p>}
+      {mode === 'export' && (
+        <div>
+          <label htmlFor="export-text">Deck as text</label>
+          <textarea id="export-text" rows={10} readOnly value={exported} />
+          <p>
+            <button
+              type="button"
+              className="button"
+              onClick={async () => {
+                try {
+                  await navigator.clipboard.writeText(exported);
+                  setCopied(true);
+                } catch {
+                  setCopied(false);
+                }
+              }}
+            >
+              Copy
+            </button>{' '}
+            {copied && <span className="muted">Copied</span>}
+          </p>
+        </div>
+      )}
+    </div>
   );
 }
 
