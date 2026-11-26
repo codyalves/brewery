@@ -70,10 +70,10 @@ describe('deck stats', () => {
 
   it('AC-5: charts have screen reader text', () => {
     render(<DeckStats deck={deck} />);
-    const curve = within(screen.getByRole('list', { name: 'Mana curve' }));
-    expect(curve.getByText('Mana value 2: 4 cards')).toBeTruthy();
-    expect(curve.getByText('Mana value 1: 3 cards')).toBeTruthy();
-    expect(curve.getByText('Mana value 7+: 2 cards')).toBeTruthy();
+    const curve = within(screen.getByRole('figure', { name: 'Mana curve' }));
+    expect(curve.getByRole('img', { name: 'Mana value 2: 4 cards' })).toBeTruthy();
+    expect(curve.getByRole('img', { name: 'Mana value 1: 3 cards' })).toBeTruthy();
+    expect(curve.getByRole('img', { name: 'Mana value 7+: 2 cards' })).toBeTruthy();
     expect(screen.getByText('Blue 8')).toBeTruthy();
     expect(screen.getByText('Instants 7')).toBeTruthy();
     expect(screen.getByText('3.11')).toBeTruthy();

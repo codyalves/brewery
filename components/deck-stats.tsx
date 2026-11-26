@@ -9,9 +9,21 @@ const COLOR_VAR: Record<string, string> = {
   G: 'var(--mana-g)',
 };
 
-function Bar({ label, count, max, fill }: { label: string; count: number; max: number; fill?: string }) {
+function Bar({
+  label,
+  count,
+  max,
+  fill,
+  description,
+}: {
+  label: string;
+  count: number;
+  max: number;
+  fill?: string;
+  description?: string;
+}) {
   return (
-    <div className="stat-bar">
+    <div className="stat-bar" role="img" aria-label={description ?? `${label} ${count}`}>
       <span className="num stat-count">{count}</span>
       <span
         className="stat-fill"
@@ -36,16 +48,17 @@ export function DeckStats({ deck }: { deck: Deck }) {
       </p>
 
       <h3>Mana curve</h3>
-      <div className="stat-bars" aria-hidden="true">
+      <figure className="stat-bars" aria-label="Mana curve">
         {curve.map((b) => (
-          <Bar key={b.label} label={b.label} count={b.count} max={curveMax} />
+          <Bar
+            key={b.label}
+            label={b.label}
+            count={b.count}
+            max={curveMax}
+            description={`Mana value ${b.label}: ${b.count === 0 ? 'no cards' : plural(b.count, 'card')}`}
+          />
         ))}
-      </div>
-      <ul className="visually-hidden" aria-label="Mana curve">
-        {curve.map((b) => (
-          <li key={b.label}>{`Mana value ${b.label}: ${b.count === 0 ? 'no cards' : plural(b.count, 'card')}`}</li>
-        ))}
-      </ul>
+      </figure>
 
       <h3>Colors</h3>
       <div className="stat-bars" aria-hidden="true">
