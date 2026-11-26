@@ -425,6 +425,38 @@
     },
     {
       "object": "card",
+      "id": "0f2c4a3e-6b1d-5d7a-9c38-2e5b7a1d4c90",
+      "oracle_id": "b7d1e6a2-3c4f-5a89-8d21-6f0e9c3b5a17",
+      "name": "Goblin Guide",
+      "mana_cost": "{R}",
+      "cmc": 1,
+      "type_line": "Creature — Goblin Scout",
+      "oracle_text": "Haste\nWhenever Goblin Guide attacks, defending player reveals the top card of their library. If it's a land card, that player puts it into their hand.",
+      "colors": ["R"],
+      "color_identity": ["R"],
+      "legalities": {
+        "standard": "not_legal",
+        "pioneer": "not_legal",
+        "modern": "legal",
+        "legacy": "legal",
+        "pauper": "not_legal",
+        "vintage": "legal",
+        "commander": "legal"
+      },
+      "set_name": "Zendikar",
+      "rarity": "rare",
+      "prices": {
+        "usd": "2.50"
+      },
+      "scryfall_uri": "https://scryfall.com/card/fixture/0f2c4a3e-6b1d-5d7a-9c38-2e5b7a1d4c90",
+      "image_uris": {
+        "normal": "https://cards.scryfall.io/normal/front/0/f/0f2c4a3e-6b1d-5d7a-9c38-2e5b7a1d4c90.jpg"
+      },
+      "power": "2",
+      "toughness": "2"
+    },
+    {
+      "object": "card",
       "id": "8392823a-7dd1-5c3c-aa01-a13d8f536a3c",
       "oracle_id": "04a68f22-149e-5a9f-b053-3ae34a7297ae",
       "name": "Lightning Bolt",

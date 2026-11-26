@@ -2,6 +2,7 @@ import { CardResults } from '@/components/card-results';
 import { Topbar } from '@/components/topbar';
 import { scryfall } from '@/lib/cards';
 import type { SearchResult } from '@/lib/scryfall';
+import { searchCards } from '@/lib/search';
 
 export const metadata = { title: 'Card search · Brewery' };
 
@@ -16,14 +17,14 @@ export default async function CardsPage({ searchParams }: { searchParams: Params
   let result: SearchResult = { cards: [], total: 0, hasMore: false };
   if (query) {
     try {
-      result = await scryfall().search(query, page);
+      result = await searchCards(scryfall(), query, page);
     } catch {
       // An invalid query or Scryfall being unavailable reads as no matches.
     }
   }
   return (
     <>
-      <Topbar query={query} />
+      <Topbar query={query} hint />
       <main className="page">
         <CardResults query={query} page={page} {...result} />
       </main>
