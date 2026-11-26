@@ -43,6 +43,63 @@ for (const colorScheme of ['light', 'dark'] as const) {
 }
 
 const RESULTS = '/cards?q=t:instant c:u';
+const SORTED = '/cards?q=t:instant';
+const altTexts = (page: import('@playwright/test').Page) =>
+  page
+    .locator('.card-grid > li a.card-link img')
+    .evaluateAll((e) => e.map((i) => (i as HTMLImageElement).alt));
+
+test('AC-1: the sort selector offers Name, Mana value and Rarity', async ({ page }) => {
+  await page.goto(SORTED);
+  expect(await page.getByLabel('Sort by').locator('option').allInnerTexts()).toEqual([
+    'Name',
+    'Mana value',
+    'Rarity',
+  ]);
+});
+
+test('AC-2: choosing Mana value puts lower mana values first', async ({ page }) => {
+  await page.goto(SORTED);
+  await page.getByLabel('Sort by').selectOption({ label: 'Mana value' });
+  await page.getByRole('button', { name: 'Apply' }).click();
+  await expect(page).toHaveURL(/order=cmc/);
+  const names = await altTexts(page);
+  // Lightning Bolt costs 1, Counterspell costs 2.
+  expect(names.indexOf('Lightning Bolt')).toBeLessThan(names.indexOf('Counterspell'));
+});
+
+test('AC-3: the direction control reverses the order', async ({ page }) => {
+  await page.goto(`${SORTED}&order=name&dir=asc`);
+  const asc = await altTexts(page);
+  await page.getByLabel('Direction').selectOption({ label: 'Descending' });
+  await page.getByRole('button', { name: 'Apply' }).click();
+  await expect(page).toHaveURL(/dir=desc/);
+  expect(await altTexts(page)).toEqual([...asc].reverse());
+});
+
+test('AC-4: Prints shows more results than Cards', async ({ page }) => {
+  await page.goto('/cards?q=bolt&unique=cards');
+  expect(await page.getByLabel('Show').locator('option').allInnerTexts()).toEqual(['Cards', 'Prints']);
+  const cards = await page.locator('.card-grid > li').count();
+  await page.getByLabel('Show').selectOption({ label: 'Prints' });
+  await page.getByRole('button', { name: 'Apply' }).click();
+  await expect(page).toHaveURL(/unique=prints/);
+  expect(await page.locator('.card-grid > li').count()).toBeGreaterThan(cards);
+});
+
+test('AC-5: sort, direction and unique are restored from the URL', async ({ page }) => {
+  await page.goto(`${SORTED}&order=rarity&dir=desc&unique=prints`);
+  await expect(page.getByLabel('Sort by')).toHaveValue('rarity');
+  await expect(page.getByLabel('Direction')).toHaveValue('desc');
+  await expect(page.getByLabel('Show')).toHaveValue('prints');
+});
+
+test('AC-6: the page with sort controls has no serious axe violations', async ({ page }) => {
+  await page.goto(`${SORTED}&order=cmc`);
+  const results = await new AxeBuilder({ page }).analyze();
+  const serious = results.violations.filter((v) => v.impact === 'serious' || v.impact === 'critical');
+  expect(serious.map((v) => v.id)).toEqual([]);
+});
 
 test('AC-1: submitting t:creature c:r shows only matching cards', async ({ page }) => {
   await page.goto('/cards');

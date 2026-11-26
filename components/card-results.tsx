@@ -1,6 +1,10 @@
 import Link from 'next/link';
 import { ManaCost } from '@/components/mana-cost';
 import type { Card } from '@/lib/card';
+import type { SortOptions } from '@/lib/scryfall';
+
+type Sort = Required<SortOptions>;
+const DEFAULT_SORT: Sort = { order: 'name', dir: 'asc', unique: 'cards' };
 
 export const EXAMPLE_SEARCHES = [
   { query: 't:instant c:u', note: 'blue instants' },
@@ -9,10 +13,48 @@ export const EXAMPLE_SEARCHES = [
 ] as const;
 
 /** The URL of a results page. */
-export function searchHref(query: string, page = 1): string {
+export function searchHref(query: string, page = 1, sort?: Sort): string {
   const params = new URLSearchParams({ q: query });
+  if (sort) {
+    for (const key of ['order', 'dir', 'unique'] as const) {
+      if (sort[key] !== DEFAULT_SORT[key]) params.set(key, sort[key]);
+    }
+  }
   if (page > 1) params.set('page', String(page));
   return `/cards?${params.toString()}`;
+}
+
+function SortControls({ query, sort }: { query: string; sort: Sort }) {
+  return (
+    <form action="/cards" className="sort-controls">
+      <input type="hidden" name="q" value={query} />
+      <label>
+        Sort by{' '}
+        <select name="order" defaultValue={sort.order}>
+          <option value="name">Name</option>
+          <option value="cmc">Mana value</option>
+          <option value="rarity">Rarity</option>
+        </select>
+      </label>{' '}
+      <label>
+        Direction{' '}
+        <select name="dir" defaultValue={sort.dir}>
+          <option value="asc">Ascending</option>
+          <option value="desc">Descending</option>
+        </select>
+      </label>{' '}
+      <label>
+        Show{' '}
+        <select name="unique" defaultValue={sort.unique}>
+          <option value="cards">Cards</option>
+          <option value="prints">Prints</option>
+        </select>
+      </label>{' '}
+      <button type="submit" className="button">
+        Apply
+      </button>
+    </form>
+  );
 }
 
 export function CardTile({ card }: { card: Card }) {
@@ -48,12 +90,14 @@ export function CardResults({
   total,
   page,
   hasMore,
+  sort = DEFAULT_SORT,
 }: {
   query: string;
   cards: readonly Card[];
   total: number;
   page: number;
   hasMore: boolean;
+  sort?: Sort;
 }) {
   if (!query.trim()) {
     return (
@@ -98,6 +142,7 @@ export function CardResults({
         <span className="muted"> match </span>
         <span className="mono">{query}</span>
       </p>
+      <SortControls query={query} sort={sort} />
       <ul className="card-grid">
         {cards.map((card) => (
           <CardTile key={card.id} card={card} />
@@ -105,12 +150,12 @@ export function CardResults({
       </ul>
       <nav className="pager" aria-label="Pages">
         {page > 1 ? (
-          <Link href={searchHref(query, page - 1)} className="button">
+          <Link href={searchHref(query, page - 1, sort)} className="button">
             Previous page
           </Link>
         ) : null}
         {hasMore ? (
-          <Link href={searchHref(query, page + 1)} className="button">
+          <Link href={searchHref(query, page + 1, sort)} className="button">
             Next page
           </Link>
         ) : null}

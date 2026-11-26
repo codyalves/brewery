@@ -22,6 +22,17 @@ export interface SearchResult {
   readonly hasMore: boolean;
 }
 
+export const ORDERS = ['name', 'cmc', 'rarity'] as const;
+export const DIRS = ['asc', 'desc'] as const;
+export const UNIQUES = ['cards', 'prints'] as const;
+
+/** Scryfall's `order`, `dir` and `unique` search parameters. */
+export interface SortOptions {
+  readonly order?: (typeof ORDERS)[number];
+  readonly dir?: (typeof DIRS)[number];
+  readonly unique?: (typeof UNIQUES)[number];
+}
+
 export class ScryfallError extends Error {
   readonly status: number;
   constructor(message: string, status: number) {
@@ -55,10 +66,14 @@ export function createScryfall(options: ScryfallOptions = {}) {
 
   return {
     /** Cards matching a Scryfall search query, one page (175 cards) at a time. */
-    async search(query: string, page = 1): Promise<SearchResult> {
+    async search(query: string, page = 1, sort: SortOptions = {}): Promise<SearchResult> {
       const q = query.trim();
       if (!q) return { cards: [], total: 0, hasMore: false };
-      const body = (await get(`/cards/search?q=${encodeURIComponent(q)}&page=${page}`)) as {
+      let path = `/cards/search?q=${encodeURIComponent(q)}&page=${page}`;
+      if (sort.order) path += `&order=${sort.order}`;
+      if (sort.dir) path += `&dir=${sort.dir}`;
+      if (sort.unique) path += `&unique=${sort.unique}`;
+      const body = (await get(path)) as {
         data: unknown[];
         total_cards: number;
         has_more: boolean;
