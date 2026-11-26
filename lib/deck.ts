@@ -73,3 +73,31 @@ export function isDeck(value: unknown): value is Deck {
 export function isDeckList(value: unknown): value is Deck[] {
   return Array.isArray(value) && value.every(isDeck);
 }
+
+export const FORMAT_LABELS: Record<Format, string> = {
+  commander: 'Commander',
+  standard: 'Standard',
+  pioneer: 'Pioneer',
+  modern: 'Modern',
+  legacy: 'Legacy',
+  vintage: 'Vintage',
+  pauper: 'Pauper',
+};
+
+/** Cards in the deck, main board and sideboard, not counting the maybeboard. */
+export function cardCount(deck: Deck): number {
+  return deck.entries.filter((e) => e.board !== 'maybe').reduce((sum, e) => sum + e.quantity, 0);
+}
+
+/** Decks with the most recently created first. */
+export function newestFirst(decks: readonly Deck[]): Deck[] {
+  return [...decks].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+}
+
+export function withDeck(decks: readonly Deck[], deck: Deck): Deck[] {
+  return [...decks.filter((d) => d.id !== deck.id), deck];
+}
+
+export function withoutDeck(decks: readonly Deck[], id: string): Deck[] {
+  return decks.filter((d) => d.id !== id);
+}
