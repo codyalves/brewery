@@ -1,4 +1,4 @@
-import { FORMATS, type Format } from './card';
+import { type Color, FORMATS, type Format, type Legality } from './card';
 
 /**
  * A deck as Brewery stores it. Entries name cards by Oracle id (the same
@@ -16,6 +16,9 @@ export interface DeckEntry {
   /** Mana cost and mana value, for stats; older entries may lack them. */
   readonly manaCost?: string;
   readonly manaValue?: number;
+  /** Color identity and format legalities, for rule checks; older entries may lack them. */
+  readonly colorIdentity?: readonly Color[];
+  readonly legalities?: Readonly<Partial<Record<Format, Legality>>>;
   readonly quantity: number;
   readonly board: Board;
 }
@@ -151,6 +154,8 @@ export interface CardRef {
   readonly typeLine: string;
   readonly manaCost?: string;
   readonly manaValue?: number;
+  readonly colorIdentity?: readonly Color[];
+  readonly legalities?: Readonly<Partial<Record<Format, Legality>>>;
 }
 
 function touch(deck: Deck, entries: readonly DeckEntry[], now: Date): Deck {
@@ -170,6 +175,8 @@ export function addCard(deck: Deck, card: CardRef, now: Date): Deck {
           typeLine: card.typeLine,
           ...(card.manaCost !== undefined ? { manaCost: card.manaCost } : {}),
           ...(card.manaValue !== undefined ? { manaValue: card.manaValue } : {}),
+          ...(card.colorIdentity !== undefined ? { colorIdentity: card.colorIdentity } : {}),
+          ...(card.legalities !== undefined ? { legalities: card.legalities } : {}),
           quantity: 1,
           board: 'main' as const,
         },

@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { DeckRules } from '@/components/deck-rules';
 import { DeckStats } from '@/components/deck-stats';
 import { decksStore } from '@/components/decks';
 import {
@@ -14,6 +15,7 @@ import {
   groupEntries,
   withDeck,
 } from '@/lib/deck';
+import { canBeCommander, cardProblems, commanderEntry, problemsFor, setCommander } from '@/lib/deck-rules';
 
 /** One saved deck. Card lists come later; for now it names the deck. */
 export function DeckView({ id }: { id: string }) {
@@ -39,6 +41,8 @@ export function DeckView({ id }: { id: string }) {
     );
   }
   const count = cardCount(deck);
+  const commander = commanderEntry(deck);
+  const problems = cardProblems(deck);
 
   function currentDeck() {
     return (
@@ -71,6 +75,11 @@ export function DeckView({ id }: { id: string }) {
     if (current) save(changeQuantity(current, oracleId, delta, new Date()));
   }
 
+  function chooseCommander(oracleId: string | null) {
+    const current = currentDeck();
+    if (current) save(setCommander(current, oracleId, new Date()));
+  }
+
   return (
     <section className="decks">
       <div>
@@ -79,7 +88,23 @@ export function DeckView({ id }: { id: string }) {
           {FORMAT_LABELS[deck.format]} · <span className="num">{count}</span> {count === 1 ? 'card' : 'cards'}
         </p>
       </div>
+      {deck.format === 'commander' && (
+        <section className="deck-group" aria-labelledby="commander-heading">
+          <h2 id="commander-heading">Commander</h2>
+          {commander ? (
+            <p>
+              <span data-testid="commander-name">{commander.name}</span>{' '}
+              <button type="button" className="button-plain" onClick={() => chooseCommander(null)}>
+                Remove commander
+              </button>
+            </p>
+          ) : (
+            <p className="empty">No commander set. Choose a legendary creature from the list below.</p>
+          )}
+        </section>
+      )}
       <AddCard onChoose={add} />
+      <DeckRules deck={deck} />
       <DeckStats deck={deck} />
       {groupEntries(deck).map((g) => (
         <section key={g.group} className="deck-group" aria-labelledby={`group-${g.group}`}>
@@ -90,6 +115,16 @@ export function DeckView({ id }: { id: string }) {
             {g.entries.map((e) => (
               <li key={e.oracleId} className="card-line">
                 <span className="card-line-name">{e.name}</span>
+                {problemsFor(problems, e.oracleId).map((reason) => (
+                  <span key={reason} className="muted">
+                    {reason}
+                  </span>
+                ))}
+                {deck.format === 'commander' && canBeCommander(e) && e.oracleId !== deck.commanderId && (
+                  <button type="button" className="button-plain" onClick={() => chooseCommander(e.oracleId)}>
+                    Set as commander
+                  </button>
+                )}
                 <button
                   type="button"
                   className="button-plain"
