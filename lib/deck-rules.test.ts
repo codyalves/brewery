@@ -66,6 +66,16 @@ describe('deck rules', () => {
     expect(reasons(deckOf('modern', entries))).toEqual([]);
   });
 
+  it('AC-5: size messages state the requirement without clashing with the card count', () => {
+    const commander = sizeCheck(deckOf('commander', [entry('A', { quantity: 3 })])).message;
+    const modern = sizeCheck(deckOf('modern', [entry('A', { quantity: 1 })])).message;
+    expect(commander).toContain('exactly 100');
+    expect(commander).toContain('including the commander');
+    expect(modern).toContain('at least 60');
+    expect(commander).not.toMatch(/\d cards?/);
+    expect(modern).not.toMatch(/\d cards?/);
+  });
+
   it('AC-5: checks deck size per format', () => {
     expect(sizeCheck(deckOf('commander', [entry('A', { quantity: 100 })])).ok).toBe(true);
     expect(sizeCheck(deckOf('commander', [entry('A', { quantity: 101 })])).ok).toBe(false);
