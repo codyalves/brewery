@@ -94,8 +94,8 @@ export function sizeCheck(deck: Deck): SizeCheck {
       count,
       ok,
       message: ok
-        ? `${count} cards, as required (100)`
-        : `${count} of 100 cards: Commander decks need exactly 100 cards including the commander`,
+        ? `${count}/100 in the deck, as required`
+        : `${count} of 100: Commander decks need exactly 100 cards including the commander`,
     };
   }
   const ok = count >= 60;
@@ -103,8 +103,8 @@ export function sizeCheck(deck: Deck): SizeCheck {
     count,
     ok,
     message: ok
-      ? `${count} cards in the main deck (at least 60)`
-      : `${count} of 60 cards: the main deck needs at least 60 cards`,
+      ? `${count}/60 in the main deck, as required`
+      : `${count} of 60: the main deck needs at least 60 cards`,
   };
 }
 
