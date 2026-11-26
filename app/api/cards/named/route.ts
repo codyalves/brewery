@@ -12,6 +12,8 @@ export async function GET(request: Request) {
       typeLine: card.typeLine,
       manaCost: card.manaCost || card.faces[0]?.manaCost || '',
       manaValue: card.manaValue,
+      colorIdentity: card.colorIdentity,
+      legalities: card.legalities,
     });
   } catch {
     return Response.json({ error: 'Unavailable' }, { status: 502 });
