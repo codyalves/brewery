@@ -6,7 +6,13 @@ export async function GET(request: Request) {
   try {
     const card = name.trim() ? await scryfall().named(name) : null;
     if (!card) return Response.json({ error: 'Not found' }, { status: 404 });
-    return Response.json({ oracleId: card.oracleId, name: card.name, typeLine: card.typeLine });
+    return Response.json({
+      oracleId: card.oracleId,
+      name: card.name,
+      typeLine: card.typeLine,
+      manaCost: card.manaCost || card.faces[0]?.manaCost || '',
+      manaValue: card.manaValue,
+    });
   } catch {
     return Response.json({ error: 'Unavailable' }, { status: 502 });
   }
