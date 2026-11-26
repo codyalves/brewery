@@ -96,12 +96,18 @@ export function SearchBox({ query, hint }: { query: string; hint?: boolean }) {
             placeholder="Search cards, e.g. t:dragon c:r"
           />
           {expanded ? (
-            <ul id="search-suggestions" role="listbox" aria-label="Card name suggestions" className="suggestions">
+            <div
+              id="search-suggestions"
+              role="listbox"
+              aria-label="Card name suggestions"
+              className="suggestions"
+            >
               {names.map((name, i) => (
-                <li
+                <div
                   key={name}
                   id={`suggestion-${i}`}
                   role="option"
+                  tabIndex={-1}
                   aria-selected={i === active}
                   onMouseDown={(e) => {
                     e.preventDefault();
@@ -109,9 +115,9 @@ export function SearchBox({ query, hint }: { query: string; hint?: boolean }) {
                   }}
                 >
                   {name}
-                </li>
+                </div>
               ))}
-            </ul>
+            </div>
           ) : null}
         </div>
         <button type="submit" className="button">

@@ -55,7 +55,7 @@ test('AC-5: the browser only requests data from this site', async ({ page }) => 
   await page.goto('/cards');
   await page.getByLabel('Search cards').pressSequentially('lightning');
   await expect(page.getByRole('option').first()).toBeVisible();
-  expect([...hosts]).toEqual(['localhost']);
+  expect([...hosts]).toEqual([new URL(page.url()).hostname]);
 });
 
 test('AC-6: the input is a combobox and the suggestions a listbox', async ({ page }) => {
