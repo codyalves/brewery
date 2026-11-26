@@ -88,8 +88,8 @@ test('AC-3: grid gaps are equal and cards do not overlap', async ({ page }) => {
   );
   for (let i = 0; i < rects.length; i++) {
     for (let j = i + 1; j < rects.length; j++) {
-      const a = rects[i];
-      const b = rects[j];
+      const a = rects[i] as (typeof rects)[number];
+      const b = rects[j] as (typeof rects)[number];
       expect(a.r <= b.l + 0.5 || b.r <= a.l + 0.5 || a.b <= b.t + 0.5 || b.b <= a.t + 0.5).toBe(true);
     }
   }
