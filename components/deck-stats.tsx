@@ -43,7 +43,7 @@ export function DeckStats({ deck }: { deck: Deck }) {
       </div>
       <ul className="visually-hidden" aria-label="Mana curve">
         {curve.map((b) => (
-          <li key={b.label}>{`Mana value ${b.label}: ${plural(b.count, 'card')}`}</li>
+          <li key={b.label}>{`Mana value ${b.label}: ${b.count === 0 ? 'no cards' : plural(b.count, 'card')}`}</li>
         ))}
       </ul>
 
