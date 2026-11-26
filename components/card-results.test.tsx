@@ -26,7 +26,7 @@ describe('CardResults', () => {
 
   it('AC-3: says no cards match and repeats the query', () => {
     render(<CardResults {...base} query="zzz" cards={[]} total={0} />);
-    expect(screen.getByText('No cards match')).toBeTruthy();
+    expect(screen.getByText('No cards found')).toBeTruthy();
     expect(screen.getByText('zzz')).toBeTruthy();
   });
 

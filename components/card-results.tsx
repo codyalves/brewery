@@ -35,6 +35,9 @@ export function CardTile({ card }: { card: Card }) {
           <ManaCost cost={cost} />
         </span>
       </Link>
+      <a href={card.scryfallUrl} className="muted" rel="noreferrer">
+        Scryfall
+      </a>
     </li>
   );
 }
@@ -79,7 +82,7 @@ export function CardResults({
   if (cards.length === 0) {
     return (
       <section>
-        <h1>No cards match</h1>
+        <h1>No cards found</h1>
         <p className="empty">
           Nothing found for <span className="mono">{query}</span>. Check the spelling or try fewer filters.
         </p>

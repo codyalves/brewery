@@ -17,7 +17,7 @@ test('AC-2: says how many cards match', async ({ page }) => {
 
 test('AC-3: says when no cards match and repeats the query', async ({ page }) => {
   await page.goto('/cards?q=zzzzqx');
-  await expect(page.getByText('No cards match')).toBeVisible();
+  await expect(page.getByText('No cards found')).toBeVisible();
   await expect(page.getByRole('main').getByText('zzzzqx')).toBeVisible();
 });
 
@@ -43,6 +43,54 @@ for (const colorScheme of ['light', 'dark'] as const) {
 }
 
 const RESULTS = '/cards?q=t:instant c:u';
+
+test('AC-1: submitting t:creature c:r shows only matching cards', async ({ page }) => {
+  await page.goto('/cards');
+  await page.getByLabel('Search cards').fill('t:creature c:r');
+  await page.getByRole('button', { name: 'Search' }).click();
+  await expect(page).toHaveURL(/q=t%3Acreature\+c%3Ar/);
+  const n = await page.locator('.card-grid > li').count();
+  expect(n).toBeGreaterThan(0);
+  await expect(page.getByAltText('Counterspell')).toHaveCount(0);
+});
+
+test('AC-2: shows the result count after a search', async ({ page }) => {
+  await page.goto('/cards?q=t:creature c:r');
+  const n = await page.locator('.card-grid > li').count();
+  await expect(page.getByText(n === 1 ? '1 card' : `${n} cards`, { exact: false }).first()).toBeVisible();
+});
+
+test('AC-3: a search with no matches shows No cards found', async ({ page }) => {
+  await page.goto('/cards?q=zzzzqx');
+  await expect(page.getByText('No cards found')).toBeVisible();
+});
+
+test('AC-4: each result links to its Scryfall page', async ({ page }) => {
+  await page.goto(RESULTS);
+  const count = await page.locator('.card-grid > li').count();
+  await expect(page.locator('.card-grid a[href^="https://scryfall.com/"]')).toHaveCount(count);
+});
+
+test('AC-5: the q parameter holds the search and reloads the same results', async ({ page }) => {
+  await page.goto('/cards?q=t:creature c:r');
+  const before = await page.locator('.card-grid > li').allInnerTexts();
+  await page.reload();
+  expect(await page.locator('.card-grid > li').allInnerTexts()).toEqual(before);
+  await expect(page.getByLabel('Search cards')).toHaveValue('t:creature c:r');
+});
+
+test('AC-6: a hint under the search box lists example syntax', async ({ page }) => {
+  await page.goto('/cards');
+  await expect(page.locator('#search-hint')).toContainText('t:creature');
+  await expect(page.locator('#search-hint')).toContainText('c:r');
+});
+
+test('AC-7: search page with a query has no serious axe violations', async ({ page }) => {
+  await page.goto('/cards?q=t:creature c:r');
+  const results = await new AxeBuilder({ page }).analyze();
+  const serious = results.violations.filter((v) => v.impact === 'serious' || v.impact === 'critical');
+  expect(serious.map((v) => v.id)).toEqual([]);
+});
 
 test('AC-1: card images render at 488:680', async ({ page }) => {
   await page.goto(RESULTS);
