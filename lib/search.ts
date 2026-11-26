@@ -1,4 +1,4 @@
-import type { Scryfall, SearchResult } from './scryfall';
+import type { Scryfall, SearchResult, SortOptions } from './scryfall';
 
 /**
  * Scryfall-style search syntax ("t:creature c:r cmc<=3 o:\"draw a card\""),
@@ -33,7 +33,12 @@ export function buildSearchQuery(input: string): string | null {
 }
 
 /** Runs a search; an empty query makes no request. */
-export async function searchCards(scryfall: Scryfall, input: string, page = 1): Promise<SearchResult> {
+export async function searchCards(
+  scryfall: Scryfall,
+  input: string,
+  page = 1,
+  sort: SortOptions = {},
+): Promise<SearchResult> {
   const query = buildSearchQuery(input);
-  return query ? scryfall.search(query, page) : EMPTY;
+  return query ? scryfall.search(query, page, sort) : EMPTY;
 }

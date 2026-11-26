@@ -12,6 +12,33 @@ const expected = (pred: (c: (typeof recorded.cards)[number]) => boolean) =>
     .map((c) => c.name)
     .sort();
 
+describe('sort and unique', () => {
+  it('AC-2: order=cmc dir=asc returns ascending mana values', async () => {
+    const result = await searchCards(scryfall, 't:instant', 1, { order: 'cmc', dir: 'asc' });
+    const values = result.cards.map((c) => c.manaValue);
+    expect(values.length).toBeGreaterThan(1);
+    expect(values).toEqual([...values].sort((a, b) => a - b));
+  });
+
+  it('AC-3: dir=desc reverses the order', async () => {
+    const asc = await searchCards(scryfall, 't:instant', 1, { order: 'name', dir: 'asc', unique: 'cards' });
+    const desc = await searchCards(scryfall, 't:instant', 1, { order: 'name', dir: 'desc', unique: 'cards' });
+    expect(desc.cards.map((c) => c.id)).toEqual(asc.cards.map((c) => c.id).reverse());
+  });
+
+  it('AC-4: unique=prints returns more than unique=cards', async () => {
+    const cards = await searchCards(scryfall, 'bolt', 1, { unique: 'cards' });
+    const prints = await searchCards(scryfall, 'bolt', 1, { unique: 'prints' });
+    expect(prints.cards.length).toBeGreaterThan(cards.cards.length);
+  });
+
+  it('AC-5: sort options are sent to Scryfall as URL parameters', async () => {
+    const fetch = vi.fn(async (_url: string) => new Response('{}', { status: 404 }));
+    await createScryfall({ fetch }).search('x', 1, { order: 'rarity', dir: 'desc', unique: 'prints' });
+    expect(fetch.mock.calls[0]?.[0]).toContain('order=rarity&dir=desc&unique=prints');
+  });
+});
+
 describe('search syntax', () => {
   it('AC-1: plain words match names containing both words', async () => {
     const result = await searchCards(scryfall, 'lightning bolt');

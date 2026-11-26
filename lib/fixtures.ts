@@ -59,7 +59,16 @@ export async function fixtureFetch(url: string): Promise<Response> {
 
   if (parsed.pathname === '/cards/search') {
     const terms = (parsed.searchParams.get('q') ?? '').match(/(?:[^\s"]|"[^"]*")+/g) ?? [];
-    const found = cards.filter((c) => terms.every((t) => matches(c, t)));
+    let found = cards.filter((c) => terms.every((t) => matches(c, t)));
+    // Without `unique`, every printing is returned; `unique=cards` keeps the first of each card.
+    if (parsed.searchParams.get('unique') === 'cards') {
+      found = found.filter((c, i) => found.findIndex((o) => o.oracle_id === c.oracle_id) === i);
+    }
+    const order = parsed.searchParams.get('order') ?? 'name';
+    const sign = parsed.searchParams.get('dir') === 'desc' ? -1 : 1;
+    const rank = ['common', 'uncommon', 'rare', 'mythic'];
+    const key = (c: RawCard) => (order === 'cmc' ? c.cmc : order === 'rarity' ? rank.indexOf(c.rarity) : 0);
+    found = [...found].sort((a, b) => sign * (key(a) - key(b) || a.name.localeCompare(b.name)));
     return found.length === 0
       ? notFound()
       : json(200, { object: 'list', total_cards: found.length, has_more: false, data: found });
@@ -73,7 +82,7 @@ export async function fixtureFetch(url: string): Promise<Response> {
     const q = lower(parsed.searchParams.get('q') ?? '');
     return json(200, {
       object: 'catalog',
-      data: cards.filter((c) => lower(c.name).startsWith(q)).map((c) => c.name),
+      data: [...new Set(cards.filter((c) => lower(c.name).startsWith(q)).map((c) => c.name))],
     });
   }
   const id = /^\/cards\/([0-9a-f-]{36})$/.exec(parsed.pathname)?.[1];

@@ -502,6 +502,34 @@
     },
     {
       "object": "card",
+      "id": "8392823a-7dd1-5c3c-aa01-a13d8f536a3d",
+      "oracle_id": "04a68f22-149e-5a9f-b053-3ae34a7297ae",
+      "name": "Lightning Bolt",
+      "mana_cost": "{R}",
+      "cmc": 1,
+      "type_line": "Instant",
+      "oracle_text": "Lightning Bolt deals 3 damage to any target.",
+      "colors": ["R"],
+      "color_identity": ["R"],
+      "legalities": {
+        "modern": "legal",
+        "legacy": "legal",
+        "pauper": "legal",
+        "vintage": "legal",
+        "commander": "legal"
+      },
+      "set_name": "Magic 2011",
+      "rarity": "uncommon",
+      "prices": {
+        "usd": "2.50"
+      },
+      "scryfall_uri": "https://scryfall.com/card/fixture/8392823a-7dd1-5c3c-aa01-a13d8f536a3d",
+      "image_uris": {
+        "normal": "https://cards.scryfall.io/normal/front/8/3/8392823a-7dd1-5c3c-aa01-a13d8f536a3d.jpg"
+      }
+    },
+    {
+      "object": "card",
       "id": "0560ab4b-7883-5f8f-9718-11e30d3ddbe6",
       "oracle_id": "b686373c-3ea8-5a06-a44c-9ef5ad5376b2",
       "name": "Llanowar Elves",
